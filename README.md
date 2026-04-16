@@ -1,31 +1,41 @@
+
 # Cloud Monitoring Script
 
-A simple Python tool that monitors CPU, memory, and disk usage in real time, logs system metrics, and outputs structured JSON data. It also triggers alerts when system thresholds are exceeded.
+A Python-based monitoring tool that tracks CPU, memory, and disk usage in real time, outputs JSON data, logs metrics, and triggers alerts based on thresholds. The app is containerized using Docker.
 
 ## Features
 
 * Real-time CPU, memory, and disk monitoring
-* Modular code structure (functions + main entry point)
-* JSON-formatted output (machine-friendly)
-* Logs data to `monitor.log`
-* Alerts on high resource usage (`alerts.log`)
-* Continuous monitoring loop
+* Modular code structure (functions + main)
+* JSON-formatted output
+* Logging to `monitor.log`
+* Alerts saved in `alerts.log`
+* Dockerized for portable execution
+* Persistent logs using Docker volume
 
 ## Tech Stack
 
 * Python
 * psutil
+* Docker
 
 ## Setup & Run
+
+### Local
 
 ```bash
 pip install -r requirements.txt
 python monitor.py
 ```
 
-## Configuration
+### Docker
 
-You can adjust thresholds in `monitor.py`:
+```bash
+docker build -t monitoring-app .
+docker run -v $(pwd):/app monitoring-app
+```
+
+## Configuration
 
 ```python
 CPU_THRESHOLD = 80
@@ -47,10 +57,15 @@ DISK_THRESHOLD = 70
 
 ## Notes
 
-* Log files are created automatically
-* Logs are ignored by `.gitignore`
-* Alerts are triggered only when thresholds are exceeded
+* Logs are persisted locally when using Docker volume
+* Metrics inside Docker reflect container environment
+* Alerts trigger only when thresholds are exceeded
 
 ## Purpose
 
-This project demonstrates foundational Cloud/DevOps concepts such as monitoring, logging, alerting, and structured data output.
+This project demonstrates core DevOps concepts: monitoring, logging, alerting, containerization, and portability.
+
+
+
+
+
