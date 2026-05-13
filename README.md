@@ -1,58 +1,80 @@
-# Cloud Monitoring Script
+````markdown
+# Cloud Monitoring & Alerting System
 
-A Python-based monitoring tool that tracks CPU, memory, and disk usage in real time, outputs structured JSON logs, stores alerts, and integrates with Google Cloud Logging for centralized observability.
+A Python-based cloud monitoring application that tracks CPU, memory, and disk usage in real time, generates structured logs, stores alerts, and integrates with Google Cloud Logging, Monitoring, and Alerting for centralized observability.
 
-The application runs locally, inside Docker, and on a Google Cloud VM as a persistent background service managed by systemd.
+The application runs:
+- locally
+- inside Docker
+- on a Google Cloud VM as a persistent Linux service using systemd
+
+This project demonstrates practical DevOps, Cloud Engineering, and SRE concepts including monitoring, logging, alerting, cloud deployment, IAM troubleshooting, and dashboard visualization.
 
 ---
 
-## Features
+# Features
 
 - Real-time CPU, memory, and disk monitoring
-- Modular Python structure (functions + main loop)
-- Structured JSON log output
+- Structured JSON log generation
 - Local log persistence (`monitor.log`)
 - Alert logging (`alerts.log`)
-- Dockerized for portable execution
+- Multi-alert support (`HIGH CPU`, `HIGH MEMORY`, `HIGH DISK`)
+- Dockerized application
 - Persistent Docker volume support
-- Runs as a background service using systemd
-- Auto-restart and auto-start on VM boot
+- Linux background service using systemd
+- Auto-restart and auto-start on boot
 - Google Cloud Logging integration
-- Centralized log monitoring in GCP Logs Explorer
-- IAM-based cloud logging permissions
+- Google Cloud Monitoring dashboards
+- Log-based metrics
+- Email alerting policies
+- IAM-based logging permissions
+- Centralized observability in Google Cloud
 
 ---
 
-## Architecture
+# Architecture
 
 ```text
 monitor.py
-   ↓
+    ↓
 Python logging
-   ↓
+    ↓
 systemd service
-   ↓
+    ↓
 Google Cloud Ops Agent
-   ↓
+    ↓
 Google Cloud Logging
-```
+    ↓
+Log-based Metrics
+    ↓
+Alert Policies
+    ↓
+Email Notifications + Dashboards
+````
 
 ---
 
-## Tech Stack
+# Dashboard Screenshot
 
-- Python
-- psutil
-- Docker
-- Google Cloud Platform (Compute Engine)
-- Google Cloud Logging
-- Google Cloud Ops Agent
-- systemd
-- Linux (Ubuntu)
+![Dashboard Screenshot](screenshots/dashboards-screenshot.png)
 
 ---
 
-## Local Setup
+# Tech Stack
+
+* Python
+* psutil
+* Docker
+* Google Cloud Platform (Compute Engine)
+* Google Cloud Logging
+* Google Cloud Monitoring
+* Google Cloud Ops Agent
+* systemd
+* Linux (Ubuntu)
+
+---
+
+# Local Setup
 
 Install dependencies:
 
@@ -68,7 +90,7 @@ python monitor.py
 
 ---
 
-## Docker Setup
+# Docker Setup
 
 Build image:
 
@@ -84,25 +106,28 @@ docker run -v $(pwd):/app monitoring-app
 
 ---
 
-## Google Cloud VM Deployment
+# Google Cloud VM Deployment
 
-### 1. Enable APIs
+## 1. Enable APIs
 
 Enable:
-- Compute Engine API
-- Cloud Logging API
+
+* Compute Engine API
+* Cloud Logging API
+* Cloud Monitoring API
 
 ---
 
-### 2. Create VM
+## 2. Create VM
 
-Recommended:
-- Ubuntu LTS
-- e2-micro machine type
+Recommended configuration:
+
+* Ubuntu LTS
+* e2-micro machine type
 
 ---
 
-### 3. SSH into VM
+## 3. SSH into VM
 
 Install dependencies:
 
@@ -126,19 +151,19 @@ pip3 install -r requirements.txt
 
 ---
 
-## Google Cloud Logging Integration
+# Google Cloud Logging Integration
 
-The script uses Python logging:
+The application sends structured logs using Python logging:
 
 ```python
 logging.info(json.dumps(data))
 ```
 
-Logs are collected by the Google Cloud Ops Agent and forwarded to Google Cloud Logging.
+Logs are collected by the Google Cloud Ops Agent and forwarded to Google Cloud Logging automatically.
 
 ---
 
-## IAM Configuration (Important)
+# IAM Configuration (Important)
 
 The VM service account must have:
 
@@ -146,7 +171,7 @@ The VM service account must have:
 Logs Writer
 ```
 
-Otherwise logs will not appear in Cloud Logging.
+Otherwise logs will not appear in Google Cloud Logging.
 
 Path:
 
@@ -156,7 +181,7 @@ IAM & Admin → IAM → Service Account → Add Role → Logs Writer
 
 ---
 
-## Run as a systemd Service
+# Run as a systemd Service
 
 Create service file:
 
@@ -195,28 +220,67 @@ Check service status:
 sudo systemctl status monitor
 ```
 
+View live logs:
+
+```bash
+journalctl -u monitor -f
+```
+
 ---
 
-## View Logs
+# Google Cloud Monitoring & Alerting
 
-### Local VM logs
+This project includes:
+
+* Log-based metrics
+* Alert policies
+* Email notifications
+* Monitoring dashboards
+
+Example alert flow:
+
+```text
+HIGH MEMORY detected
+        ↓
+Log written
+        ↓
+Cloud Logging receives log
+        ↓
+Log-based metric updated
+        ↓
+Alert policy triggered
+        ↓
+Email notification sent
+```
+
+---
+
+# View Logs
+
+## Local VM Logs
 
 ```bash
 tail -f /var/log/monitor.log
 ```
 
-### Google Cloud Logs Explorer
+## systemd Logs
+
+```bash
+journalctl -u monitor -f
+```
+
+## Google Cloud Logs Explorer
 
 Example query:
 
 ```text
 resource.type="gce_instance"
-jsonPayload.message:"cpu"
+jsonPayload.message:"HIGH"
 ```
 
 ---
 
-## Configuration
+# Configuration
 
 ```python
 CPU_THRESHOLD = 80
@@ -226,41 +290,81 @@ DISK_THRESHOLD = 70
 
 ---
 
-## Example Output
+# Example Output
 
 ```json
 {
-  "timestamp": "2026-04-15 10:45:00",
+  "timestamp": "2026-05-13 13:05:30",
   "cpu": 12.5,
   "memory": 63.2,
   "disk": 48.1,
-  "status": "OK"
+  "status": "HIGH MEMORY"
 }
 ```
 
 ---
 
-## Notes
+# Project Structure
 
-- Docker metrics reflect container-level resources
-- VM deployment reflects real machine resources
-- Service continues running independently of SSH session
-- Logs can be monitored centrally in Google Cloud
-- IAM permissions are required for cloud log delivery
+```text
+cloud-monitoring-project/
+│
+├── monitor.py
+├── requirements.txt
+├── Dockerfile
+├── monitor.log
+├── alerts.log
+├── README.md
+└── screenshots/
+    └── dashboards-screenshot.png
+```
 
 ---
 
-## Purpose
+# Key Learning Outcomes
 
-This project demonstrates practical DevOps and SRE concepts including:
+This project demonstrates practical experience with:
 
-- Infrastructure monitoring
-- Structured logging
-- Cloud observability
-- Linux service management
-- Containerization
-- Cloud VM deployment
-- IAM troubleshooting
-- Centralized log analysis
+* Infrastructure monitoring
+* Structured logging
+* Cloud observability
+* Linux service management
+* Docker containerization
+* Cloud VM deployment
+* IAM troubleshooting
+* Centralized log analysis
+* Log-based metrics
+* Cloud alerting systems
+* Monitoring dashboards
 
+---
+
+# Future Improvements
+
+Potential future upgrades:
+
+* Terraform infrastructure deployment
+* GitHub Actions CI/CD pipeline
+* Kubernetes deployment (GKE)
+* Prometheus + Grafana integration
+* Slack alert notifications
+* Auto-remediation scripts
+* Multi-VM monitoring
+
+---
+
+# Purpose
+
+This project was built to practice real-world Cloud Engineering, DevOps, and Site Reliability Engineering (SRE) concepts by deploying a monitoring system from local development to a cloud-based production-style environment.
+
+````
+
+
+Commit message:
+
+```bash
+git commit -m "Finalize cloud monitoring project documentation and dashboard integration"
+````
+
+![Dashboard](screenshots/dashboard.png)
 
