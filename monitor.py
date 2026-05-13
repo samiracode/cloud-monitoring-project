@@ -23,12 +23,20 @@ def get_disk_usage():
 
 # --- Status Check ---
 def check_status(cpu, memory, disk):
+    alerts = []
+
     if cpu > CPU_THRESHOLD:
-        return "HIGH CPU"
+        alerts.append("HIGH CPU")
+
     if memory > MEMORY_THRESHOLD:
-        return "HIGH MEMORY"
+        alerts.append("HIGH MEMORY")
+
     if disk > DISK_THRESHOLD:
-        return "HIGH DISK"
+        alerts.append("HIGH DISK")
+
+    if alerts:
+        return ", ".join(alerts)
+
     return "OK"
 
 
@@ -67,6 +75,11 @@ def main():
 # --- Entry Point ---
 if __name__ == "__main__":
     main()
+
+
+
+
+
 
 
   
